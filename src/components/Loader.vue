@@ -23,11 +23,10 @@ export default {
 
 <style>
 .lds-spinner {
-  color: official;
-  display: inline-block;
-  position: relative;
+  color: official; 
   width: 80px;
   height: 80px;
+  margin: 20px auto;
 }
 .lds-spinner div {
   transform-origin: 40px 40px;

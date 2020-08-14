@@ -8,8 +8,14 @@
     </nav>
     <h2 v-if="awesome">Awesome</h2>
     <button v-on:click="awesomeHandler">Handle Awesomness</button>
-    <button v-on:click="fetchPosts">Fetch some data</button>
-    <router-view v-bind:arr="todos" v-on:submit-todo="handleAdd" v-on:delete-todo="handleDelete" />
+    <button v-on:click="handleFetch">Fetch some stuff</button>
+    <!-- <button v-on:click="fetchPosts">Fetch some data</button> -->
+    <router-view
+      v-bind:arr="todos"
+      v-bind:fetching="fetching"
+      v-on:submit-todo="handleAdd"
+      v-on:delete-todo="handleDelete"
+    />
   </div>
 </template>
 
@@ -17,13 +23,25 @@
 //import List from "./components/List";
 export default {
   name: "App",
+
   data() {
     return {
       msg: "Hello Vue",
       awesome: false,
       todos: [],
+      fetching: true,
     };
   },
+
+  async mounted() {
+    const resp = await fetch(
+      "https://jsonplaceholder.typicode.com/posts?_page=1&_limit=10"
+    );
+    const result = await resp.json();
+    this.todos = [...this.todos, ...result.map((i) => ({ ...i, done: false }))];
+    this.fetching = false;
+  },
+
   methods: {
     awesomeHandler: function () {
       if (this.awesome) {
@@ -32,24 +50,30 @@ export default {
         this.awesome = true;
       }
     },
-    handleDelete: function(id) {
-      this.todos = this.todos.filter(i => i.id !== id)
-    },
-    fetchPosts: async function () {
+
+    handleFetch: async function () {
       const resp = await fetch(
         "https://jsonplaceholder.typicode.com/posts?_page=1&_limit=10"
       );
       const result = await resp.json();
-      this.todos = [...this.todos, ...result.map((i) => ({ ...i, done: false }))];
+      this.todos = [
+        ...this.todos,
+        ...result.map((i) => ({ ...i, done: false })),
+      ];
+      this.fetching = false;
     },
+
+    handleDelete: function (id) {
+      this.todos = this.todos.filter((i) => i.id !== id);
+    },
+
     handleAdd: function (e) {
       console.log(this.todos);
       this.todos = [...this.todos, e];
     },
   },
-  components: {
-    
-  },
+
+  components: {},
 };
 </script>
 
